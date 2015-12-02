@@ -17,7 +17,7 @@ public class MainActivity extends Activity
 
 	private void test()
 	{
-		//Hi
+		//Hi im testing stuff
 	}
 
 	@Override

@@ -19,7 +19,8 @@ public class MainView extends View
 	@Override
 	protected void onDraw(Canvas canvas)
 	{
-
+		// hey dog when you read this this thing is supposed to be like alot done by christamas break
+		// so yeah
 	}
 
 	@Override

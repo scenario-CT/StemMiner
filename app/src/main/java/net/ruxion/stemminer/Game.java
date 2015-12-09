@@ -5,22 +5,24 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
-import android.view.View;
+import android.view.SurfaceView;
 import android.view.WindowManager;
 
-public class MainView extends View
+public class Game extends SurfaceView implements Runnable
 {
+	private Thread thread;
 	private static Paint paint = new Paint();
 	private static int height;
 	private static int width;
 
+	private boolean startScreen;
+	private boolean running;
 
-	public MainView(Context context, AttributeSet attrs)
+	public Game(Context context, boolean restarted)
 	{
-		super(context, attrs);
+		super(context);
 
 		Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 		Point size = new Point();
@@ -28,18 +30,29 @@ public class MainView extends View
 		width = size.x;
 		height = size.y;
 
-		System.out.println(width+"x"+height);
+		startScreen = true;
+		running = false;
+	}
+
+	@Override
+	public void run()
+	{
+		while(startScreen)
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas)
 	{
 
-		Drawable background = getResources().getDrawable(R.drawable.space);
-		background.setBounds(0, 0, width, height);
-		background.draw(canvas);
+	}
 
+	public void pause()
+	{
 
+	}
+
+	public void resume()
+	{
 
 	}
 
@@ -59,8 +72,6 @@ public class MainView extends View
 			Drawable ship = getResources().getDrawable(R.drawable.spaceship);
 			ship.setBounds(0, 0, width, height);
 			ship.draw(canvas);
-
-
 		}
 	}
 

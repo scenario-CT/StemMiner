@@ -9,7 +9,7 @@
                 tools:context=".MainActivity">
 
 
-    <net.ruxion.stemminer.MainView
+    <net.ruxion.stemminer.Game
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" android:id="@+id/view"
         android:layout_alignParentStart="true" android:layout_alignParentTop="true"/>

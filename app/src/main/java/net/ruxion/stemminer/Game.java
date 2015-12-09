@@ -15,7 +15,7 @@ import android.view.WindowManager;
 public class Game extends SurfaceView implements Runnable
 {
 	private Thread thread;
-	private SurfaceHolder ourHolder;
+	private SurfaceHolder holder;
 	private Paint paint;
 	private Canvas canvas;
 	private int height;
@@ -37,6 +37,7 @@ public class Game extends SurfaceView implements Runnable
 		startScreen = true;
 		running = false;
 		paint =  new Paint();
+		holder = getHolder();
 	}
 
 	@Override
@@ -44,32 +45,58 @@ public class Game extends SurfaceView implements Runnable
 	{
 		while(startScreen)
 		{
+			updateStart();
 
+			drawStart();
 		}
 
 		while(running)
 		{
+			updateGame();
 
+			drawGame();
 		}
+	}
+
+	public void updateStart()
+	{
+
 	}
 
 	public void drawStart()
 	{
-		if(ourHolder.getSurface().isValid())
+		if(holder.getSurface().isValid())
 		{
-			canvas = ourHolder.lockCanvas();
+			canvas = holder.lockCanvas();
 
-			ourHolder.unlockCanvasAndPost(canvas);
+			Drawable background = getResources().getDrawable(R.drawable.space);
+			background.setBounds(0, 0, width, height);
+			background.draw(canvas);
+
+			holder.unlockCanvasAndPost(canvas);
 		}
+	}
+
+	public void updateGame()
+	{
+
 	}
 
 	public void drawGame()
 	{
-		if(ourHolder.getSurface().isValid())
+		if(holder.getSurface().isValid())
 		{
-			canvas = ourHolder.lockCanvas();
+			canvas = holder.lockCanvas();
 
-			ourHolder.unlockCanvasAndPost(canvas);
+			Drawable background = getResources().getDrawable(R.drawable.space);
+			background.setBounds(0, 0, width, height);
+			background.draw(canvas);
+
+			Drawable ship = getResources().getDrawable(R.drawable.spaceship);
+			ship.setBounds(0, 0, width, height);
+			ship.draw(canvas);
+
+			holder.unlockCanvasAndPost(canvas);
 		}
 	}
 
@@ -96,10 +123,21 @@ public class Game extends SurfaceView implements Runnable
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-
 		if(startScreen)
 		{
+			if(event.getAction() == MotionEvent.ACTION_DOWN)
+			{
+				switch(StartScreenButton.getButtonPressed(event.getX(), event.getY()))
+				{
+					case instructions:
 
+						break;
+
+					case startButton:
+						startScreen = false;
+						break;
+				}
+			}
 		}
 
 		if(running)
@@ -108,5 +146,20 @@ public class Game extends SurfaceView implements Runnable
 		}
 
 		return false;
+	}
+
+	enum StartScreenButton
+	{
+		startButton(0,0,0,0), instructions(0,0,0,0);
+
+		private StartScreenButton(int startX, int startY, int endX, int endY) //keeping in mind they are vectors
+		{
+
+		}
+
+		public static StartScreenButton getButtonPressed(float x, float y)
+		{
+			return startButton;
+		}
 	}
 }

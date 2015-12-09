@@ -8,13 +8,16 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
 public class Game extends SurfaceView implements Runnable
 {
 	private Thread thread;
+	private SurfaceHolder ourHolder;
 	private Paint paint;
+	private Canvas canvas;
 	private int height;
 	private int width;
 
@@ -52,12 +55,22 @@ public class Game extends SurfaceView implements Runnable
 
 	public void drawStart()
 	{
+		if(ourHolder.getSurface().isValid())
+		{
+			canvas = ourHolder.lockCanvas();
 
+			ourHolder.unlockCanvasAndPost(canvas);
+		}
 	}
 
 	public void drawGame()
 	{
+		if(ourHolder.getSurface().isValid())
+		{
+			canvas = ourHolder.lockCanvas();
 
+			ourHolder.unlockCanvasAndPost(canvas);
+		}
 	}
 
 	public void pause()
@@ -83,6 +96,17 @@ public class Game extends SurfaceView implements Runnable
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
+
+		if(startScreen)
+		{
+
+		}
+
+		if(running)
+		{
+
+		}
+
 		return false;
 	}
 }

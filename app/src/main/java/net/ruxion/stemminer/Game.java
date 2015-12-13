@@ -30,7 +30,7 @@ public class Game extends SurfaceView implements Runnable
 
     private boolean running;
 
-    private ArrayList<Astroid> astroids = new ArrayList<Astroid>();
+    private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
     private int shipX = 0;
     private boolean show = false;
 
@@ -145,13 +145,13 @@ class Ship
 
 }
 
-class Astroid
+class Asteroid
 {
     private int x;
     private int y;
     private int size;
 
-    public Astroid(int x, int size)
+    public Asteroid(int x, int size)
     {
         this.x = x;
         this.y = 0;

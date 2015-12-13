@@ -7,53 +7,53 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity
 {
-	private Game game;
+    private Game game;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(game = new Game(this, false));
-	}
+    @Override
+    protected void onCreate (Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(game = new Game(this, false));
+    }
 
-	public void restartGame()
-	{
-		setContentView(game = new Game(this, true));
-	}
+    public void restartGame ()
+    {
+        setContentView(game = new Game(this, true));
+    }
 
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
+    @Override
+    protected void onResume ()
+    {
+        super.onResume();
 
-		game.resume();
-	}
+        game.resume();
+    }
 
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
+    @Override
+    protected void onPause ()
+    {
+        super.onPause();
 
-		game.pause();
-	}
+        game.pause();
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		int id = item.getItemId();
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item)
+    {
+        int id = item.getItemId();
 
-		if (id == R.id.action_settings)
-		{
-			return true;
-		}
+        if (id == R.id.action_settings)
+        {
+            return true;
+        }
 
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -1,6 +1,7 @@
 package net.ruxion.stemminer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -12,68 +13,70 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Game extends SurfaceView implements Runnable
 {
     private Thread thread;
     private SurfaceHolder holder;
     private Paint paint;
     private Canvas canvas;
+    private Bitmap space;
+    private Bitmap spaceship;
     private int height;
     private int width;
 
-    private boolean startScreen;
     private boolean running;
 
-    public Game (Context context, boolean restarted)
+    private ArrayList<Astroid> astroids = new ArrayList<Astroid>();
+    private int shipX = 0;
+    private boolean show = false;
+
+    private Timer timer = new Timer();
+
+    public Game (Context context)
     {
         super(context);
 
-        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        width = size.x;
-        height = size.y;
-
-        startScreen = true;
         running = false;
         paint = new Paint();
         holder = getHolder();
     }
 
     @Override
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight)
+    {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        this.width = width;
+        this.height = height;
+
+        space = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.space, width, height);
+        spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
+    }
+
+    public void start()
+    {
+        running = true;
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    @Override
     public void run ()
     {
-        while (startScreen)
-        {
-            updateStart();
-
-            drawStart();
-        }
+        timer.schedule( new TimerTask() {
+            public void run() {
+                // do your work
+            }
+        }, 0, 60*1000);
 
         while (running)
         {
             updateGame();
 
             drawGame();
-        }
-    }
-
-    public void updateStart ()
-    {
-
-    }
-
-    public void drawStart ()
-    {
-        if (holder.getSurface().isValid())
-        {
-            canvas = holder.lockCanvas();
-
-            Drawable background = getResources().getDrawable(R.drawable.space);
-            background.setBounds(0, 0, width, height);
-            background.draw(canvas);
-
-            holder.unlockCanvasAndPost(canvas);
         }
     }
 
@@ -88,58 +91,18 @@ public class Game extends SurfaceView implements Runnable
         {
             canvas = holder.lockCanvas();
 
-            Drawable background = getResources().getDrawable(R.drawable.space);
-            background.setBounds(0, 0, width, height);
-            background.draw(canvas);
+            canvas.drawBitmap (space, 0, 0, paint);
 
-            Drawable ship = getResources().getDrawable(R.drawable.spaceship);
-            ship.setBounds(0, 0, width, height);
-            ship.draw(canvas);
+            canvas.drawBitmap(spaceship, shipX, (int)(height*.85), paint);
 
             holder.unlockCanvasAndPost(canvas);
         }
     }
 
-    public void pause ()
-    {
-        running = false;
-        try
-        {
-            thread.join();
-        } catch (InterruptedException e)
-        {
-            Log.e("Error:", "joining thread caused exception:");
-        }
-    }
-
-    public void resume ()
-    {
-        running = true;
-        thread = new Thread(this);
-        thread.start();
-    }
-
     @Override
     public boolean onTouchEvent (MotionEvent event)
     {
-        if (startScreen)
-        {
-            if (event.getAction() == MotionEvent.ACTION_DOWN)
-            {
-                switch (StartScreenButton.getButtonPressed(event.getX(), event.getY()))
-                {
-                    case instructions:
-
-                        break;
-
-                    case startButton:
-                        startScreen = false;
-                        break;
-                }
-            }
-        }
-
-        if (running)
+        if (event.getAction() == MotionEvent.ACTION_DOWN)
         {
 
         }
@@ -147,18 +110,76 @@ public class Game extends SurfaceView implements Runnable
         return false;
     }
 
-    enum StartScreenButton
+}
+
+class Ship
+{
+    private boolean right = false;
+    private boolean left  = false;
+    private int x = 0;
+
+    public int getX()
     {
-        startButton(0, 0, 0, 0), instructions(0, 0, 0, 0);
+        return x;
+    }
 
-        private StartScreenButton (int startX, int startY, int endX, int endY) //keeping in mind they are vectors
-        {
+    public void setMoving(boolean leftright)
+    {
+        right = left = false;
 
-        }
+        if(leftright)
+            right = true;
+        else
+            left = true;
+    }
 
-        public static StartScreenButton getButtonPressed (float x, float y)
-        {
-            return startButton;
-        }
+    public boolean movingRight()
+    {
+        return right;
+    }
+
+    public boolean movingLeft()
+    {
+        return left;
+    }
+
+}
+
+class Astroid
+{
+    private int x;
+    private int y;
+    private int size;
+
+    public Astroid(int x, int size)
+    {
+        this.x = x;
+        this.y = 0;
+        this.size = size;
+    }
+
+    public void setY(int y)
+    {
+        this.y = y;
+    }
+
+    public void setSize(int size)
+    {
+        this.size = size;
+    }
+
+    public int getX()
+    {
+        return x;
+    }
+
+    public int getY()
+    {
+        return y;
+    }
+
+    public int getSize()
+    {
+        return size;
     }
 }

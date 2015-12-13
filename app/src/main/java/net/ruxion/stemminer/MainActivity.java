@@ -13,28 +13,15 @@ public class MainActivity extends Activity
     protected void onCreate (Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(game = new Game(this, false));
-    }
-
-    public void restartGame ()
-    {
-        setContentView(game = new Game(this, true));
+        setContentView(game = new Game(this));
     }
 
     @Override
-    protected void onResume ()
+    protected void onResume()
     {
         super.onResume();
 
-        game.resume();
-    }
-
-    @Override
-    protected void onPause ()
-    {
-        super.onPause();
-
-        game.pause();
+        game.start();
     }
 
     @Override

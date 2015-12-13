@@ -22,12 +22,13 @@ public class Game extends SurfaceView implements Runnable
     private Bitmap spaceship;
     private int height;
     private int width;
+    private int xIntervals;
+    private int yIntervals;
 
     private boolean running;
 
     private ArrayList<Asteroid> asteroids = new ArrayList<Asteroid>();
-    private int shipX = 0;
-    private boolean show = false;
+    private Ship ship = new Ship();
 
     private Timer timer = new Timer();
 
@@ -47,6 +48,9 @@ public class Game extends SurfaceView implements Runnable
         this.width = width;
         this.height = height;
 
+        xIntervals = (int) (width  *.5);
+        yIntervals = (int) (height *.5);
+
         space = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.space, width, height);
         spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
     }
@@ -61,9 +65,11 @@ public class Game extends SurfaceView implements Runnable
     @Override
     public void run ()
     {
-        timer.schedule( new TimerTask() {
-            public void run() {
-                // do your work
+        timer.schedule( new TimerTask()
+        {
+            public void run()
+            {
+
             }
         }, 0, 60*1000);
 
@@ -77,7 +83,14 @@ public class Game extends SurfaceView implements Runnable
 
     public void updateGame ()
     {
+        if(ship.movingRight())
+        {
+            ship.setX(1);
+        }
+        else if(ship.movingLeft())
+        {
 
+        }
     }
 
     public void drawGame ()
@@ -88,7 +101,7 @@ public class Game extends SurfaceView implements Runnable
 
             canvas.drawBitmap (space, 0, 0, paint);
 
-            canvas.drawBitmap(spaceship, shipX, (int)(height*.85), paint);
+            canvas.drawBitmap(spaceship, ship.getX(), (int)(height*.85), paint);
 
             holder.unlockCanvasAndPost(canvas);
         }
@@ -97,9 +110,15 @@ public class Game extends SurfaceView implements Runnable
     @Override
     public boolean onTouchEvent (MotionEvent event)
     {
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-        {
 
+        switch(event.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                ship.setMoving(true);
+                break;
+            case MotionEvent.ACTION_BUTTON_RELEASE:
+                ship.stopMoving();
+                break;
         }
 
         return false;
@@ -113,19 +132,29 @@ class Ship
     private boolean left  = false;
     private int x = 0;
 
-    public int getX()
+    public void setX(int x)
     {
-        return x;
+        this.x = x;
+    }
+
+    public void stopMoving()
+    {
+        right = left = false;
     }
 
     public void setMoving(boolean leftright)
     {
-        right = left = false;
+        stopMoving();
 
         if(leftright)
             right = true;
         else
             left = true;
+    }
+
+    public int getX()
+    {
+        return x;
     }
 
     public boolean movingRight()

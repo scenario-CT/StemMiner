@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 
 public class Quiz extends AppCompatActivity
 {
@@ -18,14 +19,43 @@ public class Quiz extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
+        Button one = (Button) findViewById(R.id.button);
+        one.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick (View view)
             {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                MainActivity.act.lose();
+            }
+        });
+
+        Button two = (Button) findViewById(R.id.button);
+        two.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick (View view)
+            {
+                MainActivity.act.restart();
+            }
+        });
+
+        Button three = (Button) findViewById(R.id.button);
+        three.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick (View view)
+            {
+                MainActivity.act.lose();
+            }
+        });
+
+        Button four = (Button) findViewById(R.id.button);
+        four.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick (View view)
+            {
+                MainActivity.act.lose();
             }
         });
     }

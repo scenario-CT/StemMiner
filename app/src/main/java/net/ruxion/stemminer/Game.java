@@ -9,6 +9,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,10 +21,12 @@ public class Game extends SurfaceView implements Runnable
     private Canvas canvas;
     private Bitmap space;
     private Bitmap spaceship;
+    private Bitmap asteroid;
     private int height;
     private int width;
-    private int xIntervals;
-    private int yIntervals;
+    private int xInterval;
+    private int yInterval;
+    private int xIntervalPos;
 
     private boolean running;
 
@@ -39,6 +42,14 @@ public class Game extends SurfaceView implements Runnable
         running = false;
         paint = new Paint();
         holder = getHolder();
+
+        xIntervalPos = 0;
+    }
+
+    public void stop()
+    {
+        timer.cancel();
+        thread.stop();
     }
 
     @Override
@@ -48,11 +59,28 @@ public class Game extends SurfaceView implements Runnable
         this.width = width;
         this.height = height;
 
-        xIntervals = (int) (width  *.5);
-        yIntervals = (int) (height *.5);
+        xInterval = (width  / 40) - 5;
+        yInterval = (height / 100);
+
+        System.out.println(xInterval);
 
         space = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.space, width, height);
         spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
+        asteroid = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.asteroid, 0, 20);
+
+        timer.schedule(new TimerTask()
+        {
+            private int asteroidsLeft = 10;
+            private Random r = new Random();
+
+            public void run ()
+            {
+                if(asteroidsLeft != 0)
+                {
+                    asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
+                }
+            }
+        }, 0, 1000);
     }
 
     public void start()
@@ -65,14 +93,6 @@ public class Game extends SurfaceView implements Runnable
     @Override
     public void run ()
     {
-        timer.schedule( new TimerTask()
-        {
-            public void run()
-            {
-
-            }
-        }, 0, 60*1000);
-
         while (running)
         {
             updateGame();
@@ -85,11 +105,35 @@ public class Game extends SurfaceView implements Runnable
     {
         if(ship.movingRight())
         {
-            ship.setX(1);
+            if(xIntervalPos != 40)
+            {
+                xIntervalPos += 1;
+                ship.setX(xInterval * xIntervalPos);
+            }
         }
         else if(ship.movingLeft())
         {
+            if(xIntervalPos != 0)
+            {
+                xIntervalPos -= 1;
+                ship.setX(xInterval * xIntervalPos);
+            }
+        }
 
+        for(int i = 0; i < asteroids.size();)
+        {
+            Asteroid a = asteroids.get(i);
+
+            if(a.getyIntervalPos() != 100)
+            {
+                a.setyIntervalPos(a.getyIntervalPos()+1);
+                a.setY(yInterval * a.getyIntervalPos());
+                i++;
+            }
+            else
+            {
+                asteroids.remove(i);
+            }
         }
     }
 
@@ -101,7 +145,13 @@ public class Game extends SurfaceView implements Runnable
 
             canvas.drawBitmap (space, 0, 0, paint);
 
-            canvas.drawBitmap(spaceship, ship.getX(), (int)(height*.85), paint);
+            canvas.drawBitmap(spaceship, ship.getX(), (int) (height * .85), paint);
+
+            for(int i = 0; i < asteroids.size(); i++)
+            {
+                Asteroid a = asteroids.get(i);
+                canvas.drawBitmap(asteroid, a.getX(), a.getY(), paint);
+            }
 
             holder.unlockCanvasAndPost(canvas);
         }
@@ -114,14 +164,21 @@ public class Game extends SurfaceView implements Runnable
         switch(event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
-                ship.setMoving(true);
+                if(Util.contains(0, 0, (int)(width*.5), height, (int)event.getX(), (int)event.getY()))
+                {
+                    ship.setMoving(false);
+                }
+                else
+                {
+                    ship.setMoving(true);
+                }
                 break;
-            case MotionEvent.ACTION_BUTTON_RELEASE:
+            case MotionEvent.ACTION_UP:
                 ship.stopMoving();
                 break;
         }
 
-        return false;
+        return true;
     }
 
 }
@@ -173,6 +230,7 @@ class Asteroid
 {
     private int x;
     private int y;
+    private int yIntervalPos;
     private int size;
 
     public Asteroid(int x, int size)
@@ -180,6 +238,12 @@ class Asteroid
         this.x = x;
         this.y = 0;
         this.size = size;
+        this.yIntervalPos = 0;
+    }
+
+    public void setyIntervalPos(int yIntervalPos)
+    {
+        this.yIntervalPos = yIntervalPos;
     }
 
     public void setY(int y)
@@ -205,5 +269,10 @@ class Asteroid
     public int getSize()
     {
         return size;
+    }
+
+    public int getyIntervalPos()
+    {
+        return yIntervalPos;
     }
 }

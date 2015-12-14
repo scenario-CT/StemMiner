@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="net.ruxion.stemminer.Quiz"
+    tools:context="net.ruxion.stemminer.Lose"
     android:background="@drawable/space">
 
-    <include layout="@layout/content_quiz"/>
+    <include layout="@layout/content_lose"/>
 
 </android.support.design.widget.CoordinatorLayout>

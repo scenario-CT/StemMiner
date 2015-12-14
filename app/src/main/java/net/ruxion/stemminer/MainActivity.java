@@ -8,6 +8,7 @@ import android.view.MenuItem;
 public class MainActivity extends Activity
 {
     private Game game;
+    public static MainActivity act;
 
     @Override
     protected void onCreate (Bundle savedInstanceState)
@@ -16,11 +17,31 @@ public class MainActivity extends Activity
         setContentView(game = new Game(this));
     }
 
+    public void restart()
+    {
+        if(game != null)
+            game.stop();
+        setContentView(game = new Game(this));
+    }
+
+    public void lose()
+    {
+        if(game != null)
+            game.stop();
+        setContentView(R.layout.activity_lose);
+    }
+
+    public void quiz()
+    {
+        if(game != null)
+            game.stop();
+        setContentView(R.layout.activity_quiz);
+    }
+
     @Override
     protected void onResume()
     {
         super.onResume();
-
         game.start();
     }
 

@@ -1,6 +1,7 @@
 package net.ruxion.stemminer;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate (Bundle savedInstanceState)
     {
+        act = this;
         super.onCreate(savedInstanceState);
         setContentView(game = new Game(this));
     }
@@ -21,21 +23,24 @@ public class MainActivity extends Activity
     {
         if(game != null)
             game.stop();
-        setContentView(game = new Game(this));
+        Intent myIntent = new Intent(this, Game.class);
+        startActivity(myIntent);
     }
 
     public void lose()
     {
         if(game != null)
             game.stop();
-        setContentView(R.layout.activity_lose);
+        Intent myIntent = new Intent(this, Lose.class);
+        startActivity(myIntent);
     }
 
     public void quiz()
     {
         if(game != null)
             game.stop();
-        setContentView(R.layout.activity_quiz);
+        Intent myIntent = new Intent(this, Quiz.class);
+        startActivity(myIntent);
     }
 
     @Override

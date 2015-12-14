@@ -49,7 +49,7 @@ public class Game extends SurfaceView implements Runnable
     public void stop()
     {
         timer.cancel();
-        thread.stop();
+        running = false;
     }
 
     @Override
@@ -62,11 +62,11 @@ public class Game extends SurfaceView implements Runnable
         xInterval = (width  / 40) - 5;
         yInterval = (height / 100);
 
-        System.out.println(xInterval);
-
         space = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.space, width, height);
         spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
         asteroid = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.asteroid, 0, 20);
+
+        asteroids.add(new Asteroid(new Random().nextInt(xInterval * 40), 5));
 
         timer.schedule(new TimerTask()
         {
@@ -75,10 +75,12 @@ public class Game extends SurfaceView implements Runnable
 
             public void run ()
             {
-                if(asteroidsLeft != 0)
-                {
-                    asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
-                }
+//                if (asteroidsLeft != 0)
+//                {
+//                    asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
+//                    asteroidsLeft--;
+//                }
+                asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
             }
         }, 0, 1000);
     }
@@ -135,6 +137,20 @@ public class Game extends SurfaceView implements Runnable
                 asteroids.remove(i);
             }
         }
+
+        Rec playerHitBox = new Rec(new int[]{ ship.getX(), (int)(height * .85)}, new int[]{ship.getX()+(int)(width*.128), height}  );
+
+        for(Asteroid a : asteroids)
+        {
+            Rec asteroidHitBox = new Rec(new int[]{ a.getX()+20, a.getY()}, new int[]{a.getX()+120, a.getY()+110}             );
+
+            if(Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.bottomRight[0], asteroidHitBox.bottomRight[1])
+            || Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.topLeft[0], asteroidHitBox.bottomRight[1]))
+            {
+                MainActivity.act.lose();
+            }
+
+        }
     }
 
     public void drawGame ()
@@ -143,13 +159,15 @@ public class Game extends SurfaceView implements Runnable
         {
             canvas = holder.lockCanvas();
 
-            canvas.drawBitmap (space, 0, 0, paint);
+            canvas.drawBitmap(space, 0, 0, paint);
 
             canvas.drawBitmap(spaceship, ship.getX(), (int) (height * .85), paint);
 
             for(int i = 0; i < asteroids.size(); i++)
             {
                 Asteroid a = asteroids.get(i);
+//                int[][] asteroidHitBox = {{a.getX()+20, a.getY()}, {a.getX()+120, a.getY()+110}};
+//                canvas.drawRect(asteroidHitBox[0][0], asteroidHitBox[0][1], asteroidHitBox[1][0], asteroidHitBox[1][1], paint);
                 canvas.drawBitmap(asteroid, a.getX(), a.getY(), paint);
             }
 

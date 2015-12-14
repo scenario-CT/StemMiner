@@ -16,8 +16,6 @@ public class Quiz extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         Button one = (Button) findViewById(R.id.button);
         one.setOnClickListener(new View.OnClickListener()

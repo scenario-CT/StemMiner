@@ -92,7 +92,7 @@ public class Game extends SurfaceView implements Runnable
     {
         while (!started) {}
 
-        timer.scheduleAtFixedRate(new Spawner(this), 0, 1000);
+        timer.schedule(new Spawn(this), 0);
 
 		while(!bwah) {}
 
@@ -122,10 +122,10 @@ public class Game extends SurfaceView implements Runnable
             }
         }
 
-//		if(asteroids.size() == 0)
-//		{
-//			MainActivity.act.quiz();
-//		}
+		if(asteroids.size() == 0)
+		{
+			MainActivity.act.quiz();
+		}
 
         for(int i = 0; i < asteroids.size();)
         {
@@ -216,13 +216,13 @@ public class Game extends SurfaceView implements Runnable
 
 }
 
-class Spawner extends TimerTask
+class Spawn extends TimerTask
 {
 	private int asteroidsLeft = 8;
 	private Random r = new Random();
 	private Game game;
 
-	public Spawner(Game game)
+	public Spawn(Game game)
 	{
 		this.game = game;
 	}
@@ -237,7 +237,7 @@ class Spawner extends TimerTask
 		}
 		else
 		{
-			timer.cancel();
+			cancel();
 		}
 	}
 }

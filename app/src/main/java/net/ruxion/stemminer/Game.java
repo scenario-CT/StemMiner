@@ -78,13 +78,30 @@ public class Game extends SurfaceView implements Runnable
         spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
         asteroid = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.asteroid, 0, 20);
 
-        asteroids.add(new Asteroid(new Random().nextInt(xInterval * 40), 5));
+		started = true;
+    }
+
+    public void start()
+    {
+        running = true;
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    @Override
+    public void run ()
+    {
+		System.out.println("3");
+
+        while (!started) {}
 
         timer.schedule(new Spawner(), 0, 1000);
 
-		printState();
-
-		started = true;
+        while (running)
+        {
+            updateGame();
+            drawGame();
+        }
     }
 
     class Spawner extends TimerTask
@@ -117,39 +134,6 @@ public class Game extends SurfaceView implements Runnable
 //            }
         }
     }
-
-    public void start()
-    {
-        running = true;
-        thread = new Thread(this);
-        thread.start();
-    }
-
-    @Override
-    public void run ()
-    {
-		System.out.println("3");
-        while (running)
-        {
-            if(started)
-			{
-				updateGame();
-				drawGame();
-			}
-        }
-    }
-
-	public void printState()
-	{
-		System.out.println("\nscore = "+(score-2));
-		for(Asteroid a : asteroids)
-		{
-			System.out.println("\nsize = "+a.getSize());
-			System.out.println("x = "+a.getX());
-			System.out.println("y = "+a.getY());
-			System.out.println("yIntPos = "+a.getyIntervalPos()+"\n");
-		}
-	}
 
     public void updateGame ()
     {
@@ -218,7 +202,7 @@ public class Game extends SurfaceView implements Runnable
             canvas.drawBitmap(spaceship, ship.getX(), (int) (height * .85), paint);
             paint.setTextSize(70);
             paint.setColor(Color.GREEN);
-            canvas.drawText(score-2+"", 100, 100, paint);
+            canvas.drawText(score+"", 100, 100, paint);
 
             for(int i = 0; i < asteroids.size(); i++)
             {
@@ -252,6 +236,18 @@ public class Game extends SurfaceView implements Runnable
         }
 
         return true;
+    }
+
+    public void printState()
+    {
+        System.out.println("\nscore = "+(score-2));
+        for(Asteroid a : asteroids)
+        {
+            System.out.println("\nsize = "+a.getSize());
+            System.out.println("x = "+a.getX());
+            System.out.println("y = "+a.getY());
+            System.out.println("yIntPos = "+a.getyIntervalPos()+"\n");
+        }
     }
 
 }

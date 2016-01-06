@@ -42,7 +42,7 @@ public class Quiz extends AppCompatActivity
             }
         });
 
-        Button two = (Button) findViewById(R.id.button);
+        Button two = (Button) findViewById(R.id.button2);
         two.setText(ques.getTwo());
         two.setOnClickListener(new View.OnClickListener()
         {
@@ -56,7 +56,7 @@ public class Quiz extends AppCompatActivity
             }
         });
 
-        Button three = (Button) findViewById(R.id.button);
+        Button three = (Button) findViewById(R.id.button3);
         three.setText(ques.getThree());
         three.setOnClickListener(new View.OnClickListener()
         {
@@ -70,7 +70,7 @@ public class Quiz extends AppCompatActivity
             }
         });
 
-        Button four = (Button) findViewById(R.id.button);
+        Button four = (Button) findViewById(R.id.button4);
         four.setText(ques.getFour());
         four.setOnClickListener(new View.OnClickListener()
         {

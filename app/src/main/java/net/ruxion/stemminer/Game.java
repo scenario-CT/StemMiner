@@ -18,30 +18,31 @@ import java.util.TimerTask;
 
 public class Game extends SurfaceView implements Runnable
 {
-    private Thread thread;
-    private SurfaceHolder holder;
-    private Paint paint;
-    private Canvas canvas;
-    private Bitmap space;
-    private Bitmap spaceship;
-    private Bitmap asteroid;
-    private int height;
-    private int width;
-    private int xInterval;
-    private int yInterval;
-    private int xIntervalPos;
+	public Thread thread;
+	public SurfaceHolder holder;
+	public Paint paint;
+	public Canvas canvas;
+	public Bitmap space;
+	public Bitmap spaceship;
+	public Bitmap asteroid;
+	public int height;
+	public int width;
+	public int xInterval;
+	public int yInterval;
+	public int xIntervalPos;
 
-    private int score = 0;
+	public int score = 0;
 
-    private boolean running;
+	public boolean running;
 
-    private List<Asteroid> asteroids = Collections.synchronizedList(new ArrayList<Asteroid>());
-    private Ship ship = new Ship();
+    public static List<Asteroid> asteroids = Collections.synchronizedList(new ArrayList<Asteroid>());
+	public static boolean bwah = false;
+	public Ship ship = new Ship();
 
-    private Timer timer = new Timer();
-    private int length = 1000;
+	public Timer timer = new Timer();
+	public int length = 1000;
 
-	private boolean started;
+	public boolean started;
 
     public Game (Context context)
     {
@@ -53,8 +54,6 @@ public class Game extends SurfaceView implements Runnable
 		started = false;
 
         xIntervalPos = 0;
-
-		System.out.println("1");
     }
 
     public void stop()
@@ -91,47 +90,16 @@ public class Game extends SurfaceView implements Runnable
     @Override
     public void run ()
     {
-		System.out.println("3");
-
         while (!started) {}
 
-        timer.schedule(new Spawner(), 0, 1000);
+        timer.schedule(new Spawn(this), 0);
+
+		while(!bwah) {}
 
         while (running)
         {
             updateGame();
             drawGame();
-        }
-    }
-
-    class Spawner extends TimerTask
-    {
-        private int asteroidsLeft = 8;
-        private Random r = new Random();
-
-        public void run ()
-        {
-            if (asteroidsLeft != 0)
-            {
-                asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
-                asteroidsLeft--;
-            }
-//            else
-//            {
-//                timer.purge();
-//                timer.cancel();
-//                timer = new Timer();
-//
-//                if(length != 300)
-//                {
-//                    length -= 100;
-//                    timer.schedule(new Spawner(), 0, length);
-//                }
-//                else
-//                {
-//                    timer.schedule(new Spawner(), 0, 300);
-//                }
-//            }
         }
     }
 
@@ -153,6 +121,11 @@ public class Game extends SurfaceView implements Runnable
                 ship.setX(xInterval * xIntervalPos);
             }
         }
+
+		if(asteroids.size() == 0)
+		{
+			MainActivity.act.quiz();
+		}
 
         for(int i = 0; i < asteroids.size();)
         {
@@ -177,18 +150,13 @@ public class Game extends SurfaceView implements Runnable
         {
             Rec asteroidHitBox = new Rec(new int[]{ a.getX()+20, a.getY()}, new int[]{a.getX()+100, a.getY()+82}             );
 
-            if(Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.bottomRight[0], asteroidHitBox.bottomRight[1])
-            || Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.topLeft[0], asteroidHitBox.bottomRight[1]))
-            {
-                MainActivity.act.lose();
-            }
+//            if(Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.bottomRight[0], asteroidHitBox.bottomRight[1])
+//            || Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.topLeft[0], asteroidHitBox.bottomRight[1]))
+//            {
+//                MainActivity.act.lose();
+//            }
 
         }
-
-		if(asteroids.size() == 0)
-		{
-			MainActivity.act.quiz();
-		}
     }
 
     public void drawGame ()
@@ -222,13 +190,9 @@ public class Game extends SurfaceView implements Runnable
         {
             case MotionEvent.ACTION_DOWN:
                 if(Util.contains(0, 0, (int)(width*.5), height, (int)event.getX(), (int)event.getY()))
-                {
                     ship.setMoving(false);
-                }
                 else
-                {
                     ship.setMoving(true);
-                }
                 break;
             case MotionEvent.ACTION_UP:
                 ship.stopMoving();
@@ -250,6 +214,32 @@ public class Game extends SurfaceView implements Runnable
         }
     }
 
+}
+
+class Spawn extends TimerTask
+{
+	private int asteroidsLeft = 8;
+	private Random r = new Random();
+	private Game game;
+
+	public Spawn(Game game)
+	{
+		this.game = game;
+	}
+
+	public void run ()
+	{
+		if (asteroidsLeft != 0)
+		{
+			game.asteroids.add(new Asteroid(r.nextInt(game.xInterval * 40), 5));
+			game.bwah = true;
+			asteroidsLeft--;
+		}
+		else
+		{
+			cancel();
+		}
+	}
 }
 
 class Ship

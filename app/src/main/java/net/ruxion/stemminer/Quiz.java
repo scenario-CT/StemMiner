@@ -97,10 +97,6 @@ enum Question
     u("120+320-20","420","250","123","124",(byte)1),
     m("How many mm in 48 cm","360","560","480","730",(byte)3),
     x("Mollecular composition of water","h2o","ho","water","wa",(byte)1);
-
-    ;
-
-
     private String question;
     private String one;
     private String two;

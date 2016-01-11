@@ -11,10 +11,9 @@ import android.view.SurfaceView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Game extends SurfaceView implements Runnable
 {
@@ -35,14 +34,17 @@ public class Game extends SurfaceView implements Runnable
 
 	public boolean running;
 
-    public static List<Asteroid> asteroids = Collections.synchronizedList(new ArrayList<Asteroid>());
-	public static boolean bwah = false;
+    public static List<Asteroid> asteroids = new ArrayList<Asteroid>();
 	public Ship ship = new Ship();
 
-	public Timer timer = new Timer();
+	private int asteroidsLeft = 8;
+	private Random r = new Random();
+	private Date asteroidHold;
+
 	public int length = 1000;
 
 	public boolean started;
+    public boolean first;
 
     public Game (Context context)
     {
@@ -52,13 +54,13 @@ public class Game extends SurfaceView implements Runnable
         paint = new Paint();
         holder = getHolder();
 		started = false;
+        first = true;
 
         xIntervalPos = 0;
     }
 
     public void stop()
     {
-        timer.cancel();
         running = false;
     }
 
@@ -90,11 +92,9 @@ public class Game extends SurfaceView implements Runnable
     @Override
     public void run ()
     {
-        while (!started) {}
+        while(!started);
 
-        timer.schedule(new Spawn(this), 0);
-
-		while(!bwah) {}
+		asteroidHold = new Date();
 
         while (running)
         {
@@ -105,50 +105,80 @@ public class Game extends SurfaceView implements Runnable
 
     public void updateGame ()
     {
-        if(ship.movingRight())
-        {
-            if(xIntervalPos != 40)
-            {
-                xIntervalPos += 1;
-                ship.setX(xInterval * xIntervalPos);
-            }
-        }
-        else if(ship.movingLeft())
-        {
-            if(xIntervalPos != 0)
-            {
-                xIntervalPos -= 1;
-                ship.setX(xInterval * xIntervalPos);
-            }
-        }
+        handleShip();
+		handleAsteroids();
+        handleHitBox();
 
-		if(asteroids.size() == 0)
+        if(first) first = !first;
+    }
+
+	private void handleShip()
+	{
+		if(ship.movingRight())
 		{
-			MainActivity.act.quiz();
+			if(xIntervalPos != 40)
+			{
+				xIntervalPos += 1;
+				ship.setX(xInterval * xIntervalPos);
+			}
 		}
+		else if(ship.movingLeft())
+		{
+			if(xIntervalPos != 0)
+			{
+				xIntervalPos -= 1;
+				ship.setX(xInterval * xIntervalPos);
+			}
+		}
+	}
 
-        for(int i = 0; i < asteroids.size();)
+	private void handleAsteroids()
+	{
+		if(first)
+			asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
+
+        if((new Date().getTime() - asteroidHold.getTime()) > 500)
         {
-            Asteroid a = asteroids.get(i);
-
-            if(a.getyIntervalPos() != 100)
+            if (asteroidsLeft != 0)
             {
-                a.setyIntervalPos(a.getyIntervalPos()+1);
-                a.setY(yInterval * a.getyIntervalPos());
-                i++;
+                asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
+                asteroidsLeft--;
             }
-            else
-            {
-                asteroids.remove(i);
-                score++;
-            }
+            asteroidHold = new Date();
         }
 
-        Rec playerHitBox = new Rec(new int[]{ ship.getX(), (int)(height * .88)}, new int[]{ship.getX()+(int)(width*.128), height}  );
+		System.out.println("asteroids ="+asteroids.size());
 
-        for(Asteroid a : asteroids)
-        {
-            Rec asteroidHitBox = new Rec(new int[]{ a.getX()+20, a.getY()}, new int[]{a.getX()+100, a.getY()+82}             );
+//		if((asteroids.size() == 0) && !first)
+//		{
+//			MainActivity.act.quiz();
+//		}
+
+		for(int i = 0; i < asteroids.size();)
+		{
+			Asteroid a = asteroids.get(i);
+
+			if(a.getyIntervalPos() != 100)
+			{
+				a.setyIntervalPos(a.getyIntervalPos()+1);
+				a.setY(yInterval * a.getyIntervalPos());
+				i++;
+			}
+			else
+			{
+				asteroids.remove(i);
+				score++;
+			}
+		}
+	}
+
+	private void handleHitBox()
+	{
+		Rec playerHitBox = new Rec(new int[]{ ship.getX(), (int)(height * .88)}, new int[]{ship.getX()+(int)(width*.128), height}  );
+
+		for(Asteroid a : asteroids)
+		{
+			Rec asteroidHitBox = new Rec(new int[]{ a.getX()+20, a.getY()}, new int[]{a.getX()+100, a.getY()+82}             );
 
 //            if(Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.bottomRight[0], asteroidHitBox.bottomRight[1])
 //            || Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.topLeft[0], asteroidHitBox.bottomRight[1]))
@@ -156,8 +186,8 @@ public class Game extends SurfaceView implements Runnable
 //                MainActivity.act.lose();
 //            }
 
-        }
-    }
+		}
+	}
 
     public void drawGame ()
     {
@@ -214,32 +244,6 @@ public class Game extends SurfaceView implements Runnable
         }
     }
 
-}
-
-class Spawn extends TimerTask
-{
-	private int asteroidsLeft = 8;
-	private Random r = new Random();
-	private Game game;
-
-	public Spawn(Game game)
-	{
-		this.game = game;
-	}
-
-	public void run ()
-	{
-		if (asteroidsLeft != 0)
-		{
-			game.asteroids.add(new Asteroid(r.nextInt(game.xInterval * 40), 5));
-			game.bwah = true;
-			asteroidsLeft--;
-		}
-		else
-		{
-			cancel();
-		}
-	}
 }
 
 class Ship
@@ -334,4 +338,9 @@ class Asteroid
     {
         return yIntervalPos;
     }
+
+	public String toString()
+	{
+		return "x="+x+", y="+y+", yIntervalPos="+yIntervalPos+", size="+size;
+	}
 }

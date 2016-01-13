@@ -89,7 +89,7 @@ public class Quiz extends AppCompatActivity
 
 enum Question
 {
-    q("What is C#", "Name of OS", "Programming Language", "Unit of measure", "Variable of speed", (byte)1),
+    q("What is C#", "Name of OS", "Programming Language", "Unit of measure", "Variable of speed", (byte)2),
     w("What is the unit for density?", "g/cm", "g/cm^3", "g/ft^3", "g/ft", (byte)2),
     i("What is 35 * 40", "100","1200","1400","400",(byte)3),
     t("Newton's first law", "Inertia","Force","acceleration","Macaroni",(byte)1),

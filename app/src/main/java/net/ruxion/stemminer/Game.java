@@ -20,9 +20,6 @@ public class Game extends SurfaceView implements Runnable
     private SurfaceHolder holder;
     private Paint paint;
     private Canvas canvas;
-    private Bitmap space;
-    private Bitmap spaceship;
-    private Bitmap asteroid;
     private int height;
     private int width;
     private int xInterval;
@@ -36,9 +33,11 @@ public class Game extends SurfaceView implements Runnable
     private List<Asteroid> asteroids = new ArrayList<>();
 	private Ship ship = new Ship();
 
-	private int asteroidsLeft = 8;
+	private int asteroidsLeft;
 	private Random r = new Random();
 	private Date asteroidHold;
+
+    private boolean started = false;
 
     public Game (Context context)
     {
@@ -49,6 +48,8 @@ public class Game extends SurfaceView implements Runnable
         holder = getHolder();
 
         xIntervalPos = 0;
+
+        asteroidsLeft = MainActivity.stage * 8;
     }
 
     public void stop()
@@ -67,9 +68,7 @@ public class Game extends SurfaceView implements Runnable
         xInterval = (width  / 40) - 5;
         yInterval = (height / 100);
 
-        space = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.space, width, height);
-        spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
-        asteroid = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.asteroid, 0, 20);
+        started = true;
     }
 
     public void start()
@@ -84,11 +83,17 @@ public class Game extends SurfaceView implements Runnable
     {
 		asteroidHold = new Date();
 
+        while(!started);
+
         while (running)
         {
             updateGame();
             drawGame();
         }
+
+        MainActivity.upStage();
+
+        System.out.println(MainActivity.stage);
     }
 
     public void updateGame ()
@@ -120,7 +125,12 @@ public class Game extends SurfaceView implements Runnable
 
 	private void handleAsteroids()
 	{
-        if((new Date().getTime() - asteroidHold.getTime()) > 500)
+        int speed = 500;
+
+        if(!(speed <= 30))
+            speed = (500 - (MainActivity.stage * 50));
+
+        if((new Date().getTime() - asteroidHold.getTime()) > speed )
         {
             if (asteroidsLeft != 0)
             {
@@ -156,13 +166,13 @@ public class Game extends SurfaceView implements Runnable
 
 		for(Asteroid a : asteroids)
 		{
-			Rec asteroidHitBox = new Rec(new int[]{ a.getX()+20, a.getY()}, new int[]{a.getX()+100, a.getY()+82}             );
+			Rec asteroidHitBox = new Rec(new int[]{ a.getX()+20, a.getY()}, new int[]{a.getX()+85, a.getY()+82}             );
 
-//            if(Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.bottomRight[0], asteroidHitBox.bottomRight[1])
-//            || Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.topLeft[0], asteroidHitBox.bottomRight[1]))
-//            {
-//                MainActivity.act.lose();
-//            }
+            if(Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.bottomRight[0], asteroidHitBox.bottomRight[1])
+            || Util.contains(playerHitBox.topLeft[0], playerHitBox.topLeft[1], playerHitBox.bottomRight[0], playerHitBox.bottomRight[1], asteroidHitBox.topLeft[0], asteroidHitBox.bottomRight[1]))
+            {
+                MainActivity.act.lose();
+            }
 
 		}
 	}
@@ -173,9 +183,9 @@ public class Game extends SurfaceView implements Runnable
         {
             canvas = holder.lockCanvas();
 
-            canvas.drawBitmap(space, 0, 0, paint);
+            canvas.drawBitmap(MainActivity.space, 0, 0, paint);
 
-            canvas.drawBitmap(spaceship, ship.getX(), (int) (height * .85), paint);
+            canvas.drawBitmap(MainActivity.spaceship, ship.getX(), (int) (height * .85), paint);
             paint.setTextSize(70);
             paint.setColor(Color.GREEN);
             canvas.drawText(score+"", 100, 100, paint);
@@ -183,7 +193,7 @@ public class Game extends SurfaceView implements Runnable
             for(int i = 0; i < asteroids.size(); i++)
             {
                 Asteroid a = asteroids.get(i);
-                canvas.drawBitmap(asteroid, a.getX(), a.getY(), paint);
+                canvas.drawBitmap(MainActivity.asteroid, a.getX(), a.getY(), paint);
             }
 
             holder.unlockCanvasAndPost(canvas);

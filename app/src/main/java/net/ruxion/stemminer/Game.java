@@ -10,41 +10,35 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 public class Game extends SurfaceView implements Runnable
 {
-	public Thread thread;
-	public SurfaceHolder holder;
-	public Paint paint;
-	public Canvas canvas;
-	public Bitmap space;
-	public Bitmap spaceship;
-	public Bitmap asteroid;
-	public int height;
-	public int width;
-	public int xInterval;
-	public int yInterval;
-	public int xIntervalPos;
+	private Thread thread;
+    private SurfaceHolder holder;
+    private Paint paint;
+    private Canvas canvas;
+    private Bitmap space;
+    private Bitmap spaceship;
+    private Bitmap asteroid;
+    private int height;
+    private int width;
+    private int xInterval;
+    private int yInterval;
+    private int xIntervalPos;
 
-	public int score = 0;
+    private int score = 0;
 
-	public boolean running;
+    private boolean running;
 
-    public static List<Asteroid> asteroids = new ArrayList<Asteroid>();
-	public Ship ship = new Ship();
+    private List<Asteroid> asteroids = new ArrayList<>();
+	private Ship ship = new Ship();
 
 	private int asteroidsLeft = 8;
 	private Random r = new Random();
 	private Date asteroidHold;
-
-	public int length = 1000;
-
-	public boolean started;
-    public boolean first;
 
     public Game (Context context)
     {
@@ -53,8 +47,6 @@ public class Game extends SurfaceView implements Runnable
         running = false;
         paint = new Paint();
         holder = getHolder();
-		started = false;
-        first = true;
 
         xIntervalPos = 0;
     }
@@ -78,8 +70,6 @@ public class Game extends SurfaceView implements Runnable
         space = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.space, width, height);
         spaceship = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.spaceship, 0, 50);
         asteroid = Util.decodeSampledBitmapFromResource(getResources(), R.drawable.asteroid, 0, 20);
-
-		started = true;
     }
 
     public void start()
@@ -92,8 +82,6 @@ public class Game extends SurfaceView implements Runnable
     @Override
     public void run ()
     {
-        while(!started);
-
 		asteroidHold = new Date();
 
         while (running)
@@ -108,8 +96,6 @@ public class Game extends SurfaceView implements Runnable
         handleShip();
 		handleAsteroids();
         handleHitBox();
-
-        if(first) first = !first;
     }
 
 	private void handleShip()
@@ -134,9 +120,6 @@ public class Game extends SurfaceView implements Runnable
 
 	private void handleAsteroids()
 	{
-		if(first)
-			asteroids.add(new Asteroid(r.nextInt(xInterval * 40), 5));
-
         if((new Date().getTime() - asteroidHold.getTime()) > 500)
         {
             if (asteroidsLeft != 0)
@@ -146,13 +129,6 @@ public class Game extends SurfaceView implements Runnable
             }
             asteroidHold = new Date();
         }
-
-		System.out.println("asteroids ="+asteroids.size());
-
-//		if((asteroids.size() == 0) && !first)
-//		{
-//			MainActivity.act.quiz();
-//		}
 
 		for(int i = 0; i < asteroids.size();)
 		{
@@ -168,6 +144,8 @@ public class Game extends SurfaceView implements Runnable
 			{
 				asteroids.remove(i);
 				score++;
+                if(asteroids.size() == 1)
+                    MainActivity.act.quiz();
 			}
 		}
 	}
@@ -230,18 +208,6 @@ public class Game extends SurfaceView implements Runnable
         }
 
         return true;
-    }
-
-    public void printState()
-    {
-        System.out.println("\nscore = "+(score-2));
-        for(Asteroid a : asteroids)
-        {
-            System.out.println("\nsize = "+a.getSize());
-            System.out.println("x = "+a.getX());
-            System.out.println("y = "+a.getY());
-            System.out.println("yIntPos = "+a.getyIntervalPos()+"\n");
-        }
     }
 
 }

@@ -23,7 +23,8 @@ public class MainActivity extends Activity
     {
         if(game != null)
             game.stop();
-        Intent myIntent = new Intent(this, Game.class);
+
+        Intent myIntent = new Intent(this, this.getClass());
         startActivity(myIntent);
     }
 
